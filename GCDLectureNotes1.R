@@ -74,8 +74,67 @@ if (!file.exists("data")) {
         dir.create("data")
 }
 
+## Getting data from the internet - download.file()
+# - Downloads a file from the internet
+# - Even if you do this by hand, helps with reproducibility
+# - Important parameters are url, destfile, method
+# - Useful for downloading tab-delimited, csv, and other files
 
- 
+## Example - Baltimore camera data
+fileURL <- "https://data.baltimorecity.gov/api/views/dz54-2aru/rows.csv?accessType=DOWNLOAD"
+download.file(fileURL, destfile = "./data/cameras.csv", method = "curl")
+list.files("./data")
+dateDownloaded <- date()
+dateDownloaded
+
+## Some notes about download.file()
+# - If the url starts with 'http' you can use download.file()
+# - If the url starts with 'https' on Windows you may be okay (method = "curl" if not)
+# - If the file is BIG, it might take a while
+# - Be sure to record when you downloaded!!
+
+
+## Reading local flat files
+## Loading flat files - read.table()
+# - This is the main function for reading data into R
+# - Flexible and robust but requires more parameters
+# - Reads the data into RAM - big data can cause problems
+# - Important parameters: file, header, sep, row.names, nrows
+# - Related: read.csv(), read.csv2()
+
+cameraData <- read.table("./data/cameras.csv") # gives error. defaults to tab-delineated, ours is comma delineated
+head(cameraData)                               # doesn't exist bc R couldn't read data
+
+
+cameraData <- read.table("./data/cameras.csv", sep = ",", header = TRUE)
+head(cameraData)
+
+cameraData2 <- read.csv("./data/cameras.csv") # defaults to comma-delineated bc thats what csv's are. USE THIS ON CSVs.
+head(cameraData2)
+
+## Other read.table() paramaters
+# - quote - you can tell R whether there are any quoted values. quote="" means no quotes
+# - na.strings - set the character that represents a missing value
+# - nrows - how many rows to read of the file
+# - skip - number of lines to skip before starting to read
+# Biggest trouble with reading flat files are quotation marks ' or " placed in data values. quote="" often resolves issue.
+
+
+## Excel Files
+
+if(!file.exists("data")) {dir.create("data")}
+fileURL <- "https://data.baltimorecity.gov/api/views/dz54-2aru/rows.xlsx?accessType=DOWNLOAD"
+download.file(fileURL, destfile = "./data/cameras.xlsx", method = "curl")
+dateDownloaded2 <- date()
+
+library('xlsx')
+
+
+
+
+
+
+
 
 
 
