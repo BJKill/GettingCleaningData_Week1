@@ -120,22 +120,25 @@ head(cameraData2)
 # Biggest trouble with reading flat files are quotation marks ' or " placed in data values. quote="" often resolves issue.
 
 
-## Excel Files
-
+## Excel Files - EXAMPLE FILE NO LONGER EXISTS. MOTHER FUCKER. Code fails because of it. USE AS TEMPLATE.
 if(!file.exists("data")) {dir.create("data")}
 fileURL <- "https://data.baltimorecity.gov/api/views/dz54-2aru/rows.xlsx?accessType=DOWNLOAD"
 download.file(fileURL, destfile = "./data/cameras.xlsx", method = "curl")
 dateDownloaded2 <- date()
-
 library('xlsx')
+cameraData3 <- read.xlsx("./data/cameras.xlsx", sheetIndex = 1, header = TRUE)
+colIndex <- 2:3
+rowIndex <- 1:4
+cameraDataSubset <- read.xlsx("./data/cameras.xlsx", sheetIndex = 1, colIndex = colIndex, rowIndex = rowIndex)
+cameraDataSubset
 
 
-
-
-
-
-
-
+## Further Notes on Excel files
+# - The write.xlsx function will write out an Excel file w/ similar arguments
+# - read.xlsx2 is much faster than read.xlsx but for reading subsets of rows my be slightly unstable
+# - The XLConnect package has more options for writing and manipulating excel files. vignette is where to start!
+# - In general, it is advised to store your data in either a database or in comma separated files (.csv) or tab separated
+#   files (.tab/.txt) as they are easier to distribute - not everybody has access to Excel!
 
 
 
