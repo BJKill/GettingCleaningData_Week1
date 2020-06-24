@@ -141,7 +141,74 @@ cameraDataSubset
 #   files (.tab/.txt) as they are easier to distribute - not everybody has access to Excel!
 
 
+## Reading XML - Extensible Markup Language
+# - Frequently used to store structured data
+# - Particularly widely used in internet applications
+# - Extracting XML is the basis for most web scraping
+# - Components:
+#       - Markup - labels that give the text structure
+#       - Content - the actual text of the document
 
+## Tags, Elements, and Attributes
+# - Tags correspond to general labels
+#       - Start tags   <section>
+#       - End tags     </section>
+#       - Empty tags   <line-break />
+#       
+# - Elements are spectic examples of tags
+#       - <Greeting> Hello, world </Greeting>
+#       
+# - Attributes are componenets of the label
+#       - <img src="jeff.jpg" alt="instructor"/>
+#       - <step number="3"> Connect A to B. </step>
 
+## Read the file into R. Because website has 'https', need to use Rcurl -> getURL -> xmlTreeParse
+library(XML)
+library(Rcurl)
+fileURL <- "https://www.w3schools.com/XML/simple.xml"
+xData <- getURL(fileURL)
+doc <- xmlTreeParse(xData, useInternalNodes = TRUE)
+rootNode <- xmlRoot(doc)      # node that wraps whole document. Ours is <breakfast_menu>
+xmlName(rootNode)             # tells us the name of the root node. returns: "breakfast_menu"
+names(rootNode)               # lists names of sub-nodes one level down
+
+## subset XML documents like a list. first component is whole <food> node for Belgian Waffles
+rootNode[[1]]
+#returns: <food>
+#        <name>Belgian Waffles</name>
+#        <price>$5.95</price>
+#        <description>Two of our famous Belgian Waffles with plenty of real maple syrup</description>
+#        <calories>650</calories>
+#        </food> 
+
+## first component of the first component is just the <name> node of the Belgian Waffles
+rootNode[[1]][[1]]
+# returns: <name>Belgian Waffles</name> 
+
+## Programatically extract parts of the file
+xmlSApply(rootNode, xmlValue)
+
+## XPath - additional language http://www.stat.berkeley.edu/~statcur/Workshop2/Presentations/XML.pdf
+# - /node - Top level node
+# - //node - Node at any level
+# - node[@attr-name] -  Node with an attribute name
+# - node[@attr-name='bob'] - Node with attribute name attr-name='bob'
+
+## Get the items on the menu and prices
+names <- xpathSApply(rootNode, "//name", xmlValue)
+names
+prices <- xpathSApply(rootNode, "//price", xmlValue)
+prices
+
+## Another example: http://espn.go.com/nfl/team/_/name/bal/baltimore-ravens
+## DOESN'T WORK EITHER. NOTHING IS CALLED 'score' OR 'team-name' ANYMORE.
+
+fileURL <- "https://www.espn.com/nfl/team/_/name/bal/baltimore-ravens"
+xData <- getURL(fileURL)
+doc <- htmlTreeParse(xData, useInternalNodes = TRUE)
+scores <- xpathSApply(doc, "//i[@class='score']", xmlValue)
+teams <- xpathSApply(doc, "//li[@class='team-name']", xmlValue)
+scores
+teams
 
 
