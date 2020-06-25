@@ -129,7 +129,7 @@ library('xlsx')
 cameraData3 <- read.xlsx("./data/cameras.xlsx", sheetIndex = 1, header = TRUE)
 colIndex <- 2:3
 rowIndex <- 1:4
-cameraDataSubset <- read.xlsx("./data/cameras.xlsx", sheetIndex = 1, colIndex = colIndex, rowIndex = rowIndex)
+cameraDataSubset <- read.xlsx("./data/cameras.xlsx", sheet = 1, cols = colIndex, rows = rowIndex) ## should be good syntax
 cameraDataSubset
 
 
