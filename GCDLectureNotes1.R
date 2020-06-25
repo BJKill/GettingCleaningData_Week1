@@ -307,6 +307,7 @@ merge(DT1, DT2)
 #               2: a 2 5
 #               3: b 3 6
 
+
 ## Fast reading
 big_df <- data.frame(x = rnorm(1E6), y = rnorm(1E6))
 file <- tempfile()
