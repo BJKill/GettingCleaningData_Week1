@@ -202,7 +202,6 @@ prices
 
 ## Another example: http://espn.go.com/nfl/team/_/name/bal/baltimore-ravens
 ## DOESN'T WORK EITHER. NOTHING IS CALLED 'score' OR 'team-name' ANYMORE.
-
 fileURL <- "https://www.espn.com/nfl/team/_/name/bal/baltimore-ravens"
 xData <- getURL(fileURL)
 doc <- htmlTreeParse(xData, useInternalNodes = TRUE)
@@ -212,3 +211,113 @@ scores
 teams
 
 
+## JSON - Javascript Object Notation
+# - Lightweight data storage
+# - Common format for data from application programming interfaces (APIs)
+# - Similar structure to XML but different syntax/format
+# - Data stored as
+#       - Numbers (doubles)
+#       - Strings (double quoted)
+#       - Boolean (true or false)
+#       - Array (ordered, comma separated, enclosed in square brackets [])
+#       - Object (unordered, comma separated collection of key:value pairs in curley brackets {})
+# http://en.wikipedia.org/wiki/JSON
+
+library(jsonlite)
+jsonData <- fromJSON("https://api.github.com/users/jtleek/repos")
+names(jsonData)
+names(jsonData$owner)
+names(jsonData$owner$login)
+
+myjson <- toJSON(iris, pretty = TRUE)  ## from data frame -> JSON
+cat(myjson)
+iris2 <- fromJSON(myjson)              ## from JSON -> data frame
+head(iris2)
+
+## Further resources for JSON
+# - http://www.json.org/
+# - tutorial for jsonlite - http://www.r-bloggers.com/new-package-jsonlite-a-smarter-json-encoderdecoder/
+# - jsonlite vignette
+
+
+## data.table
+# - Inherets from data.frame
+#       - All functions that accept data.frame work don data.table
+# - Written in C, so it's much faster
+# - Much, much faster at subsetting, grouping, and updating
+
+library(data.table)
+DF <- data.frame(x = rnorm(9), y = rep(c("a", "b", "c"), each = 3), z = rnorm(9))
+head(DF, 3)
+
+DT <- data.table(x = rnorm(9), y = rep(c("a", "b", "c"), each = 3), z = rnorm(9))
+head(DT)
+
+tables()
+
+# Data tables subset like data frames do.
+DT[2, ]
+DT[DT$y == "a", ]
+DT[c(2,3), ]
+DT[, c(2,3)]
+mean(DT$x)
+sum(DT$z)
+DT[, table(y)] # <- creates frequency table for values in y
+DT[, w := z^2] # <- creates new column w which are the values of z^2
+head(DT)
+
+DT2 <- DT      # did not make a 'copy' of the first DT, so anything we do to DT is passed along to DT2. Weird.
+DT[, y:=2]
+head(DT, n=3)
+head(DT2, n=3)
+
+# Multiple operations on data table
+DT[, m := {tmp <- (x+z); log2(tmp+5)}]
+head(DT)
+
+# plyr like operations
+DT[, a:= x > 0]
+DT
+DT[, b:= mean(x+w), by = a]  # <- takes mean of x+w when a is true and takes mean of x+w when a is false.
+DT
+
+# Special variables
+# .N An integer, length 1, containing the number of times that a particular group appear
+set.seed(123)
+DT <- data.table(x=sample(letters[1:3], 1E5, TRUE))
+head(DT, 20)
+DT[, .N, by = x]
+# returns       x     N
+#               1: c 33294
+#               2: b 33305
+#               3: a 33401
+
+### Keys
+DT <- data.table(x = rep(c("a", "b", "c"), each = 100), y = rnorm(300))
+setkey(DT, x)
+DT['a'] # subsets data where the key (x) is equal to 'a'.
+
+## Joins
+DT1 <- data.table(x = c('a', 'a', 'b', 'dt1'), y = 1:4)
+DT2 <- data.table(x = c('a', 'b', 'dt2'), z = 5:7)
+setkey(DT1, x) ; setkey(DT2, x)
+merge(DT1, DT2)
+# returns          x y z
+#               1: a 1 5
+#               2: a 2 5
+#               3: b 3 6
+
+## Fast reading
+big_df <- data.frame(x = rnorm(1E6), y = rnorm(1E6))
+file <- tempfile()
+write.table(big_df, file = file, row.names = FALSE, col.names = TRUE, sep = "\t", quote = FALSE)
+system.time(fread(file))  # fread() is basically read.table() for tab-separated files. took 0.33 sec to read
+system.time(read.table(file, header = TRUE, sep = "\t")) # took 3.39 sec to read.
+
+## Summary and further reading
+# - the latest development version contains new functions like 'melt' and 'dcast' for data.tables
+#       - https://r-forge.r-project.org/scm/viewvc.php/pkg/NEWS?view=markup&root=datatable
+# - Here is a list of differences between data.table and data.frame
+#       - http://stackoverflow.com/questions/13618488/what-you-can-do-with-data-frame-that-you-cant-in-data-table
+# - Notes based on Raphael Gottardo's notes, who got them from Kevin Ushey
+#       - https://github.com/raphg/Biostat578/blob/master/Advanced_data_manipulation.Rpres
