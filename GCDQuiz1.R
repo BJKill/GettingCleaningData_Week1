@@ -37,22 +37,24 @@ download.file(fileURL4, destfile = "./data/IdahoInfo.csv")
 DT <- fread("./data/IdahoInfo.csv")
 head(DT)
 
-rowMeans(DT)[DT$SEX == 1]; rowMeans(DT)[DT$SEX == 2]
+rowMeans(DT)[DT$SEX == 1]; rowMeans(DT)[DT$SEX == 2]  # Error in rowMeans(DT) : 'x' must be numeric
 DT[DT$SEX == 1]
 rowMeans(DT)[DT$SEX == 1]
 class(DT[DT$SEX == 1])
 system.time({rowMeans(DT)[DT$SEX == 1]; rowMeans(DT)[DT$SEX == 2]})
 
 sapply(split(DT$pwgtp15, DT$SEX), mean)
-system.time(sapply(split(DT$pwgtp15, DT$SEX), mean))
+system.time(sapply(split(DT$pwgtp15, DT$SEX), mean)) # User time = 0.01
 DT$pwgtp15
 class(DT)
 
 tapply(DT$pwgtp15, DT$SEX, mean)
-system.time(sapply(split(DT$pwgtp15, DT$SEX), mean))
+system.time(tapply(DT$pwgtp15, DT$SEX, mean)) # User time = 0
 
 DT[, mean(pwgtp15), by = SEX]
-system.time(DT[, mean(pwgtp15), by = SEX])
+system.time(DT[, mean(pwgtp15), by = SEX])    # User time = 0. Technically the "fastest"
 
 mean(DT[DT$SEX == 1, ]$pwgtp15); mean(DT[DT$SEX == 2, ]$pwgtp15)
-system.time({mean(DT[DT$SEX == 1, ]$pwgtp15); mean(DT[DT$SEX == 2, ]$pwgtp15)})
+system.time({mean(DT[DT$SEX == 1, ]$pwgtp15); mean(DT[DT$SEX == 2, ]$pwgtp15)}) # User time = 0.03
+
+
